@@ -272,7 +272,7 @@ int main(int argc, char **argv)
 
     //================================ START CODE INIT FACE RECOGNITION =================================
     string name_id;
-    while (numFrame < 1000)
+    while (numFrame < 100)
     {
         cap >> frame;
         numFrame++;
@@ -393,7 +393,7 @@ int main(int argc, char **argv)
             break;
     }
     //================================ END CODE INIT FACE RECOGNITION =================================
-    logTemp = "average Time: " + to_string(total_f/1000);
+    logTemp = "average Time: " + to_string(total_f/100);
     logFile << logTemp;
     logFile.close();
     cv::destroyAllWindows();
