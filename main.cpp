@@ -45,6 +45,7 @@ const double MaxAngle = 10.0;
 const int RetinaWidth = 320;
 const int RetinaHeight = 240;
 float ScaleX, ScaleY;
+string logTemp;
 
 vector<std::string> NameFaces;
 //----------------------------------------------------------------------------------------
@@ -143,6 +144,7 @@ void DrawObjects(cv::Mat &frame, vector<FaceObject> &Faces)
         default:
             Str = NameFaces[obj.NameIndex];
         }
+        logTemp = "name: " + Str + "(" + std::to_string(obj.NameProb) + ")" + " ID " + "(" + std::to_string(obj.FaceProb) + ")" ;
         cv::Size label_size = cv::getTextSize(Str, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseLine);
         int x = obj.rect.x;
         int y = obj.rect.y - label_size.height - baseLine;
@@ -161,11 +163,11 @@ int main(int argc, char **argv)
 {
     //=================================   START CODE INIT VARIABLE   =================================
     float f, total_f;
-    float cf_face, cf_id;
+    
     float FPS[16];
-    int n, numFrame, Fcnt = 0;
+    int n, Fcnt = 0;
+    int numFrame = 0;
     size_t i;
-    string name_id;
     cv::Mat frame;
     cv::Mat result_cnn;
     cv::Mat faces;
@@ -186,7 +188,6 @@ int main(int argc, char **argv)
         cerr<<" Error: Unable to open log file"<< endl;
         return 1;
     }
-    string logTemp;
     Live.LoadModel();
     for (i = 0; i < 16; i++)
         FPS[i] = 0.0;
@@ -270,6 +271,7 @@ int main(int argc, char **argv)
     //================================ END CODE INIT CAMERA =================================
 
     //================================ START CODE INIT FACE RECOGNITION =================================
+    string name_id;
     while (numFrame < 1000)
     {
         cap >> frame;
@@ -303,7 +305,6 @@ int main(int argc, char **argv)
             
             for (i = 0; i < Faces.size(); i++)
             {
-                cf_face = Faces[i].FaceProb;
                 if (Faces[i].FaceProb > MinFaceThreshold)
                 {
                     // get centre aligned image
@@ -323,11 +324,9 @@ int main(int argc, char **argv)
                         int Pmax = max_element(score_.begin(), score_.end()) - score_.begin();
                         Faces[i].NameIndex = Pmax;
                         Faces[i].NameProb = score_[Pmax];
-                        cf_id = Faces[i].NameProb;
                         score_.clear();
                         if (Faces[i].NameProb >= MinFaceThreshold)
                         {
-                            name_id =NameFaces[i];
                             // recognize a face
                             if (Faces[i].rect.height < MinHeightFace)
                             {
@@ -372,19 +371,12 @@ int main(int argc, char **argv)
                 }
             }
         }
-        string face;       
-        if(Faces.size()!=0)
-        {
-            face = "got face";
-            numFrame ++;
-        }
-        else face = "unknown";
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
         total_f += f;
-        logTemp = "name: " + face + "(" + to_string(cf_face) + ")" + " ID: " + name_id + "(" + to_string(cf_id) + ")" + " time: " + to_string(f) + " ms\n";
+        logTemp+=" time: " + to_string(f) + " ms\n";
         logFile << logTemp;
 
         if (f > 0.0)
