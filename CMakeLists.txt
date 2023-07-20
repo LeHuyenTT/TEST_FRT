@@ -3,9 +3,9 @@ project(testFace)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(ncnn_DIR /home/jetson/ncnn/build/install/lib/cmake/ncnn)
-set(OpenCV_DIR /usr/include/opencv4)
-set(OpenCV_INCLUDE_DIRS /home/jetson/app/scr/opencv/build/include)
+set(ncnn_DIR /home/huyen/tencent/ncnn/build/install/lib/cmake/ncnn)
+set(OpenCV_DIR /home/huyen/opencv_build/opencv/build/include/)
+set(OpenCV_INCLUDE_DIRS /usr/local/include/opencv4/)
 
 find_package(ncnn REQUIRED)
 

@@ -7,6 +7,8 @@
 #include "TLive.h"
 #include "TBlur.h"
 #include <fstream>
+#include <chrono>
+#include <thread>
 //----------------------------------------------------------------------------------------
 //
 // Created by markson zhang
@@ -161,6 +163,7 @@ int main(int argc, char **argv)
     float FPS[16];
     int n, numFrame, Fcnt = 0;
     size_t i;
+    string name_id;
     cv::Mat frame;
     cv::Mat result_cnn;
     cv::Mat faces;
@@ -279,6 +282,7 @@ int main(int argc, char **argv)
         cv::resize(frame, result_cnn, Size(RetinaWidth, RetinaHeight), INTER_LINEAR);
         Tbegin = chrono::steady_clock::now();
         MtCNN.detect(result_cnn, Faces); //! Detect faces in picture by MTCNN
+        
         // reset indicators
         for (i = 0; i < Faces.size(); i++)
         {
@@ -294,6 +298,7 @@ int main(int argc, char **argv)
         {
             // looks stupid, running through a loop of size 1
             // however, for your convenience using [i]
+
             for (i = 0; i < Faces.size(); i++)
             {
                 if (Faces[i].FaceProb > MinFaceThreshold)
@@ -318,6 +323,7 @@ int main(int argc, char **argv)
                         score_.clear();
                         if (Faces[i].NameProb >= MinFaceThreshold)
                         {
+                            name_id =NameFaces[i];
                             // recognize a face
                             if (Faces[i].rect.height < MinHeightFace)
                             {
@@ -344,6 +350,7 @@ int main(int argc, char **argv)
                         }
                         else
                         {
+                            name_id = "stranger";
                             Faces[i].NameIndex = -1; // a stranger
                             Faces[i].Color = 1;
                         }
@@ -361,13 +368,19 @@ int main(int argc, char **argv)
                 }
             }
         }
+        string face;       
+        if(Faces.size())
+        {
+            face = "got face";
+        }
+        else face = "unknown";
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
         logTemp = "Frame: "+numFrame;
         logFile << logTemp;
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
-        logTemp +="time: " + to_string(f) + " ms\n";
+        logTemp +="name: "+ face +"name id: " + name_id + "time: " + to_string(f) + " ms\n";
         logFile << logTemp;
         if (f > 0.0)
             FPS[((Fcnt++) & 0x0F)] = 1000.0 / f;
@@ -378,6 +391,7 @@ int main(int argc, char **argv)
         cv::putText(frame, cv::format("FPS %0.2f", f / 16), cv::Point(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(180, 180, 0));
         // show output
         cv::imshow("Jetson Nano - 2014.5 MHz", frame);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         char esc = cv::waitKey(5);
         if (esc == 27)
             break;
