@@ -61,6 +61,15 @@ inline float CosineDistance(const cv::Mat &v1, const cv::Mat &v2)
     double denom_v2 = norm(v2);
     return dot / (denom_v1 * denom_v2);
 }
+void delay_ms(int delayTime) {
+    auto start = std::chrono::high_resolution_clock::now();
+    while (true) {
+        auto now = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+        if (duration >= delayTime)
+            break;
+    }
+}
 //----------------------------------------------------------------------------------------
 // painting
 //----------------------------------------------------------------------------------------
@@ -145,6 +154,7 @@ void DrawObjects(cv::Mat &frame, vector<FaceObject> &Faces)
             Str = NameFaces[obj.NameIndex];
         }
         logTemp = "name: " + Str + "(" + std::to_string(obj.NameProb) + ")" + " ID " + "(" + std::to_string(obj.FaceProb) + ")" ;
+        logFile<<log
         cv::Size label_size = cv::getTextSize(Str, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseLine);
         int x = obj.rect.x;
         int y = obj.rect.y - label_size.height - baseLine;
@@ -388,6 +398,7 @@ int main(int argc, char **argv)
         cv::putText(frame, cv::format("FPS %0.2f", f / 16), cv::Point(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(180, 180, 0));
         // show output
         cv::imshow("Jetson Nano - 2014.5 MHz", frame);
+        delay_ms(250);
         char esc = cv::waitKey(5);
         if (esc == 27)
             break;
