@@ -45,6 +45,7 @@ const double MaxAngle = 10.0;
 const int RetinaWidth = 320;
 const int RetinaHeight = 240;
 float ScaleX, ScaleY;
+
 vector<std::string> NameFaces;
 //----------------------------------------------------------------------------------------
 using namespace std;
@@ -160,6 +161,7 @@ int main(int argc, char **argv)
 {
     //=================================   START CODE INIT VARIABLE   =================================
     float f;
+    float cf_face, cf_id;
     float FPS[16];
     int n, numFrame, Fcnt = 0;
     size_t i;
@@ -298,9 +300,10 @@ int main(int argc, char **argv)
         {
             // looks stupid, running through a loop of size 1
             // however, for your convenience using [i]
-
+            
             for (i = 0; i < Faces.size(); i++)
             {
+                cf_face = Faces[i].FaceProb;
                 if (Faces[i].FaceProb > MinFaceThreshold)
                 {
                     // get centre aligned image
@@ -320,6 +323,7 @@ int main(int argc, char **argv)
                         int Pmax = max_element(score_.begin(), score_.end()) - score_.begin();
                         Faces[i].NameIndex = Pmax;
                         Faces[i].NameProb = score_[Pmax];
+                        cf_id = Faces[i].NameProb;
                         score_.clear();
                         if (Faces[i].NameProb >= MinFaceThreshold)
                         {
@@ -377,11 +381,10 @@ int main(int argc, char **argv)
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
-        logTemp = "Frame: "+numFrame;
-        logFile << logTemp;
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
-        logTemp +="name: "+ face +"name id: " + name_id + "time: " + to_string(f) + " ms\n";
+        logTemp = "name: " + face + "(" + to_string(cf_face) + ")" + " ID: " + name_id + "(" + to_string(cf_id) + ")" + " time: " + to_string(f) + " ms\n";
         logFile << logTemp;
+
         if (f > 0.0)
             FPS[((Fcnt++) & 0x0F)] = 1000.0 / f;
         for (f = 0.0, i = 0; i < 16; i++)
@@ -391,7 +394,6 @@ int main(int argc, char **argv)
         cv::putText(frame, cv::format("FPS %0.2f", f / 16), cv::Point(10, 20), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(180, 180, 0));
         // show output
         cv::imshow("Jetson Nano - 2014.5 MHz", frame);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         char esc = cv::waitKey(5);
         if (esc == 27)
             break;
