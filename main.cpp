@@ -160,7 +160,7 @@ void DrawObjects(cv::Mat &frame, vector<FaceObject> &Faces)
 int main(int argc, char **argv)
 {
     //=================================   START CODE INIT VARIABLE   =================================
-    float f;
+    float f, total_f;
     float cf_face, cf_id;
     float FPS[16];
     int n, numFrame, Fcnt = 0;
@@ -271,7 +271,7 @@ int main(int argc, char **argv)
     //================================ END CODE INIT CAMERA =================================
 
     //================================ START CODE INIT FACE RECOGNITION =================================
-    while (1)
+    while (numFrame < 1000)
     {
         cap >> frame;
         if (frame.empty())
@@ -376,12 +376,14 @@ int main(int argc, char **argv)
         if(Faces.size()!=0)
         {
             face = "got face";
+            numFrame ++;
         }
         else face = "unknown";
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
+        total_f += f;
         logTemp = "name: " + face + "(" + to_string(cf_face) + ")" + " ID: " + name_id + "(" + to_string(cf_id) + ")" + " time: " + to_string(f) + " ms\n";
         logFile << logTemp;
 
@@ -399,6 +401,8 @@ int main(int argc, char **argv)
             break;
     }
     //================================ END CODE INIT FACE RECOGNITION =================================
+    logTemp = "average Time: " + to_string(total_f/1000);
+    logFile << logTemp;
     logFile.close();
     cv::destroyAllWindows();
 
