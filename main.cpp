@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     //=================================   START CODE INIT VARIABLE   =================================
     float f;
     float FPS[16];
-    int n, Fcnt = 0;
+    int n, numFrame, Fcnt = 0;
     size_t i;
     cv::Mat frame;
     cv::Mat result_cnn;
@@ -190,6 +190,7 @@ int main(int argc, char **argv)
     //================================= START CODE ADD FACE TO DATABASE =================================
     if (argc > 1)
     {
+        numFrame++;
         const char *imagepath = argv[1];
         cv::Mat frame = cv::imread(imagepath, 1);
         if (frame.empty())
@@ -363,7 +364,7 @@ int main(int argc, char **argv)
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
-        logTemp = "Frame: "+numFake;
+        logTemp = "Frame: "+numFrame;
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
         logTemp +="time: " + to_string(f) + " ms\n";
         if (f > 0.0)
