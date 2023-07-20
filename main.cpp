@@ -6,6 +6,7 @@
 #include "TWarp.h"
 #include "TLive.h"
 #include "TBlur.h"
+#include <fstream>
 //----------------------------------------------------------------------------------------
 //
 // Created by markson zhang
@@ -175,6 +176,12 @@ int main(int argc, char **argv)
     TRetina Rtn(RetinaWidth, RetinaHeight, true);
     TBlur Blur;
     chrono::steady_clock::time_point Tbegin, Tend;
+    std::ofstream logFile("log.txt");
+    if(!logFile.is_open()) {
+        cerr<<" Error: Unable to open log file"<< endl;
+        return 1;
+    }
+    string logTemp;
     Live.LoadModel();
     for (i = 0; i < 16; i++)
         FPS[i] = 0.0;
@@ -207,7 +214,7 @@ int main(int argc, char **argv)
                 n = Str.rfind('/');
                 Str = Str.erase(0, n + 1);
                 Str = Str.erase(Str.length() - 4, Str.length() - 1); // remove .jpg
-                imwrite("./img/" + Str + ".jpg", aligned);
+                imwrite("../database/" + Str + ".jpg", aligned);
                 cout << "Stored to database : " << Str << endl;
             }
         }
@@ -356,7 +363,9 @@ int main(int argc, char **argv)
         Tend = chrono::steady_clock::now();
         DrawObjects(frame, Faces);
         // calculate frame rate
+        logTemp = "Frame: "+numFake;
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
+        logTemp +="time: " + to_string(f) + " ms\n";
         if (f > 0.0)
             FPS[((Fcnt++) & 0x0F)] = 1000.0 / f;
         for (f = 0.0, i = 0; i < 16; i++)
@@ -371,7 +380,7 @@ int main(int argc, char **argv)
             break;
     }
     //================================ END CODE INIT FACE RECOGNITION =================================
-
+    logFile.close();
     cv::destroyAllWindows();
 
     return 0;
