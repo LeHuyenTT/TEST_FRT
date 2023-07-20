@@ -373,7 +373,7 @@ int main(int argc, char **argv)
             }
         }
         string face;       
-        if(Faces.size())
+        if(Faces.size()!=0)
         {
             face = "got face";
         }
