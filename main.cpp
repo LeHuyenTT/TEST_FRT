@@ -195,7 +195,6 @@ int main(int argc, char **argv)
     //================================= START CODE ADD FACE TO DATABASE =================================
     if (argc > 1)
     {
-        numFrame++;
         const char *imagepath = argv[1];
         cv::Mat frame = cv::imread(imagepath, 1);
         if (frame.empty())
@@ -274,6 +273,7 @@ int main(int argc, char **argv)
     while (numFrame < 1000)
     {
         cap >> frame;
+        numFrame++;
         if (frame.empty())
         {
             cerr << "Error: Unable to grab from the camera" << endl;
