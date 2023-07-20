@@ -365,8 +365,10 @@ int main(int argc, char **argv)
         DrawObjects(frame, Faces);
         // calculate frame rate
         logTemp = "Frame: "+numFrame;
+        logFile << logTemp;
         f = chrono::duration_cast<chrono::milliseconds>(Tend - Tbegin).count();
         logTemp +="time: " + to_string(f) + " ms\n";
+        logFile << logTemp;
         if (f > 0.0)
             FPS[((Fcnt++) & 0x0F)] = 1000.0 / f;
         for (f = 0.0, i = 0; i < 16; i++)
